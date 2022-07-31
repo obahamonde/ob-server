@@ -25,3 +25,9 @@ class Upload(Q):
     filename: Optional[str] = Field()
     mimetype: Optional[str] = Field()
     url: Optional[HttpUrl] = Field()
+
+class Email (Q):
+    from_:Union[EmailStr, str, None] = Field(index=True)
+    to:Union[EmailStr, str, None] = Field(index=True)
+    subject:Optional[str] = Field()
+    body:Optional[str] = Field()
