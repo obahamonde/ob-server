@@ -82,8 +82,7 @@ class FQLModel(BaseModel):
                 return fql(
                     q.get(
                         q.match(q.index(f"{self.__class__.__name__}_by_{field}".lower()),
-                                self.dict()[field])))
-                return response['data']
+                                self.dict()[field])))['data']
             except FaunaError as e:
                 response = fql(
                     q.create(q.collection(f"{self.__class__.__name__.lower()}s"),

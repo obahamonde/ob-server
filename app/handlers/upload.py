@@ -1,12 +1,11 @@
 from fastapi import UploadFile, File, Request, APIRouter
 from boto3 import Session
 from botocore.exceptions import BotoCoreError, ClientError
-from typing import List, Dict, Union, Optional
 from pydantic import HttpUrl
-from app.models.schemas import User, Upload
-from app.handlers.auth import user_info
+from app.models.schemas import Upload
 from app.config import environ
-
+from app.utils import uuid4
+from urllib.parse import quote
 
 AWS_ACCESS_KEY_ID = environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = environ.get('AWS_SECRET_ACCESS_KEY')
@@ -19,12 +18,12 @@ s3 = Session(
     region_name=AWS_REGION_NAME
 ).client('s3')
 
-def upload_file(file: UploadFile)->HttpUrl:
+def upload_file(key:str,file: UploadFile)->HttpUrl:
     try:
         s3.upload_fileobj(
             file.file,
             AWS_S3_BUCKET,
-            file.filename,
+            key,
             ExtraArgs={
                 'ContentType': file.content_type,
                 'ACL': 'public-read'
@@ -37,11 +36,22 @@ def upload_file(file: UploadFile)->HttpUrl:
 
 app = APIRouter()
 
-@app.post('/upload')
-async def upload_file_to_s3(request: Request, file: UploadFile = File(...)):
+@app.post('/upload/{size}')
+async def upload_file_to_s3(request: Request, size:float, file: UploadFile = File(...)):
+    sub=request.state.user.sub
+    fid=uuid4().hex
+    url = upload_file(f'{sub}/{fid}/{file.filename}', file)
     return Upload(
-        sub=request.state.user['sub'],
+        
+        sub=sub,
         filename=file.filename,
+        url=url,
         mimetype=file.content_type,
-        url=upload_file(file)
+        size=size
     ).create()
+
+@app.get('/upload')
+async def get_uploads(request:Request):
+    sub = request.state.user.sub
+    return Upload.find_many("sub",sub,10)
+

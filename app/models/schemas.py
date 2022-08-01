@@ -1,17 +1,15 @@
 from pydantic import HttpUrl, EmailStr, Field
-from typing import Optional, Union
-from uuid import UUID, uuid4
+from typing import Optional, Union, Any, List, Dict
 from app.lib.fql import FQLModel as Q
-from app.utils import get_avatar
+from app.utils import get_avatar, uid
 
-def uid():
-    return uuid4().hex
+
 
 class User(Q):
-    sub: Union[str, UUID] = Field(default_factory=uid, index=True)
+    sub: str = Field(...)
     given_name: Optional[str] = Field()
     family_name: Optional[str] = Field()
-    nickname: str = Field(..., index=True)
+    nickname: Optional[str] = Field()
     name: Optional[str] = Field()
     picture: Optional[Union[HttpUrl, str]] = Field(default_factory=get_avatar)
     locale: Optional[Union[str, None]] = Field()
@@ -20,14 +18,25 @@ class User(Q):
     email_verified: Optional[Union[bool, str]] = Field()
 
 class Upload(Q):
-    id: Union[str, UUID] = Field(default_factory=uid, index=True)
-    sub: Union[str, UUID] = Field(..., index=True)
+    id: str = Field(default_factory=uid, index=True)
+    sub: str = Field(..., index=True)
     filename: Optional[str] = Field()
+    size: Optional[float] = Field()
     mimetype: Optional[str] = Field()
-    url: Optional[HttpUrl] = Field()
+    url: Optional[Union[HttpUrl, str]] = Field()
 
 class Email (Q):
-    from_:Union[EmailStr, str, None] = Field(index=True)
-    to:Union[EmailStr, str, None] = Field(index=True)
+    from_:Union[EmailStr, str, Any] = Field(index=True)
+    to:Union[EmailStr, str, Any] = Field(index=True)
     subject:Optional[str] = Field()
     body:Optional[str] = Field()
+    
+    
+class Product(Q):
+    sub: str = Field(..., index=True)
+    title: str = Field(...)
+    subtitle: Optional[str] = Field()
+    description: Optional[str] = Field()
+    tags:Optional[List[str]] = Field()
+    price:float=Field(...)
+    uploads:List[HttpUrl] = Field(default_factory=list)

@@ -2,10 +2,11 @@ import aiohttp
 import asyncio
 from typing import List, Dict, Any
 from pydantic import HttpUrl
+from starlette.responses import JSONResponse
 
-async def _fetch(url: HttpUrl, headers: Any) -> Dict:
+async def _fetch(url: HttpUrl, headers: Any=None) -> Dict:
     async with aiohttp.ClientSession() as session:
-        async with session.get(url=url, headers=headers) as response:
+        async with session.get(url, headers=headers) as response:
             return await response.json()
 
 async def fetch_many(urls: List[HttpUrl]) -> List[Dict]:
@@ -17,7 +18,7 @@ def fetch(urls: List[HttpUrl]) -> List[Dict]:
 async def _post(url: HttpUrl, headers: Any, data: Any) -> Dict:
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, data=data) as response:
-            return await response.json()
+            return await response
 
 async def post_many(urls: List[HttpUrl], headers: Any, data: Any) -> List[Dict]:
     return await asyncio.gather(*[asyncio.create_task(_post(url, headers, data)) for url in urls])

@@ -13,9 +13,9 @@ ses = Session(
 ).client("ses")
 
 @app.post("/email")
-async def email(email: Email):
+async def send_email_with_ses(email: Email):
     email.save()
-    await ses.send_email(
+    ses.send_email(
         Source=environ.get("AWS_SES_SOURCE"),
         Destination={
             "ToAddresses": [email.from_,email.to]

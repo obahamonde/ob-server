@@ -1,5 +1,6 @@
 from random import choice
 from uuid import uuid4
+from rich.console import Console
 
 BASE = 'https://random-data-api.com/api'
 APIS = [
@@ -21,9 +22,18 @@ APIS = [
     "/placeholdit/random_placeholdit", "/restaurant/random_restaurant"
 ]
 
+COLORS = [
+    'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white', 'black',
+]
 
 def random_urls(size: int, qty:int):
     return [f'{BASE}/{choice(APIS)}?size={size}' for i in range(1, qty)]
 
 def get_avatar():
     return f"https://avatars.dicebear.com/api/bottts/{uuid4().hex}.svg"
+
+def log(msg:str, color:str='cyan'):
+    Console().log(msg, style=color)
+
+def uid():
+    return uuid4().hex
