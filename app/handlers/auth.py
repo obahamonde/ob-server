@@ -34,5 +34,8 @@ def use_auth(app:FastAPI)->FastAPI:
             except Exception as e:
                 raise e
         return await call_next(request)
+    @app.get('/{token}')
+    async def get_user(token: str):
+        return User(**await user_info(token)).save()
     app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
     return app

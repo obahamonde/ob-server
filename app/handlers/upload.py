@@ -53,5 +53,5 @@ async def upload_file_to_s3(request: Request, size:float, file: UploadFile = Fil
 @app.get('/upload')
 async def get_uploads(request:Request):
     sub = request.state.user.sub
-    return Upload.find_many("sub",sub,10)
+    return Upload.find_many("sub",sub,50)
 

@@ -40,3 +40,13 @@ class Product(Q):
     tags:Optional[List[str]] = Field()
     price:float=Field(...)
     uploads:List[HttpUrl] = Field(default_factory=list)
+    
+    
+class IAMPolicy(Q):
+    arn:str = Field(...)
+    version:str = Field(...)
+    principals:List[str] = Field(default_factory=list)
+    resources:List[str] = Field(default_factory=list)
+    actions:List[str] = Field(default_factory=list)
+    statements:List[Dict[str,Any]] = Field(default_factory=list)
+
